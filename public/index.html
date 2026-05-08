@@ -247,6 +247,9 @@
       background: rgba(129,140,248,0.1); border: 1px solid rgba(129,140,248,0.2);
       border-radius: 20px; padding: 2px 12px; display: inline-block; margin-bottom: 0.8rem;
     }
+    .member-since {
+      font-size: 0.75rem; color: var(--muted); margin-top: 0.4rem;
+    }
     .member-desc {
       font-size: 0.83rem; color: var(--muted); line-height: 1.6;
     }
@@ -446,6 +449,7 @@
               </div>
               <div class="member-name">${escHtml(m.username)}</div>
               <div class="member-role" ${badgeStyle}>${escHtml(m.role)}</div>
+              <div class="member-since">dabei seit ${joinYear(m.joinedAt)}</div>
             </div>
           </div>
         </div>
@@ -459,8 +463,14 @@
         </div>
         <div class="member-name">${escHtml(m.username)}</div>
         <div class="member-role" ${badgeStyle}>${escHtml(m.role)}</div>
+        <div class="member-since">dabei seit ${joinYear(m.joinedAt)}</div>
       </div>
     `;
+  }
+
+  function joinYear(iso) {
+    if (!iso) return '?';
+    return new Date(iso).getFullYear();
   }
 
   function escHtml(str) {
