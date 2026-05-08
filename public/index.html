@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Team – eselbande.com</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #080810;
+      --surface: rgba(255,255,255,0.03);
+      --surface2: rgba(255,255,255,0.06);
+      --border:  rgba(255,255,255,0.07);
+      --border2: rgba(255,255,255,0.12);
+      --text:    #e2e8f0;
+      --muted:   #4a5568;
+      --accent:  #818cf8;
+      --accent2: #667eea;
+      --pink:    #f093fb;
+    }
+
+    body {
+      font-family: 'Inter', 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding-bottom: 80px;
+    }
+
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse at 15% 10%, rgba(102,126,234,0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 85% 90%, rgba(240,147,251,0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, rgba(129,140,248,0.04) 0%, transparent 60%);
+      animation: bgPulse 10s ease-in-out infinite alternate;
+    }
+
+    @keyframes bgPulse {
+      0%   { transform: scale(1); }
+      100% { transform: scale(1.03); }
+    }
+
+    /* ── Topnav ── */
+    .topnav {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0.8rem 2rem;
+      background: rgba(8,8,16,0.7);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 100;
+    }
+    .nav-brand {
+      font-weight: 700; font-size: 1rem; text-decoration: none;
+      color: var(--text); display: flex; align-items: center; gap: 0.5rem;
+    }
+    .nav-links { display: flex; align-items: center; gap: 0.5rem; }
+    .nav-link {
+      padding: 0.35rem 0.9rem; border-radius: 7px; font-size: 0.8rem;
+      font-weight: 600; text-decoration: none; color: var(--muted);
+      border: 1px solid var(--border); transition: color 0.2s, border-color 0.2s;
+    }
+    .nav-link:hover { color: var(--text); border-color: var(--border2); }
+
+    /* ── Container ── */
+    .container { max-width: 900px; margin: 0 auto; padding: 0 1.5rem; position: relative; z-index: 1; }
+
+    /* ── Hero ── */
+    .hero {
+      text-align: center;
+      padding: 4rem 1rem 3rem;
+    }
+    .hero-emoji {
+      font-size: 3.5rem;
+      display: block;
+      margin-bottom: 1rem;
+      filter: drop-shadow(0 0 30px rgba(102,126,234,0.5));
+      animation: float 4s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-8px); }
+    }
+    .hero h1 {
+      font-size: 2.8rem; font-weight: 800; margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, var(--pink), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .hero-sub {
+      color: var(--muted); font-size: 1rem; max-width: 480px;
+      margin: 0 auto; line-height: 1.7;
+    }
+
+    /* ── Section title ── */
+    .section-title {
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--accent); margin-bottom: 1.5rem;
+    }
+
+    /* ── Geschichte ── */
+    .story {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem 2.2rem;
+      margin-bottom: 3rem;
+      line-height: 1.8;
+    }
+    .story p {
+      color: var(--text); font-size: 0.93rem; margin-bottom: 1rem;
+    }
+    .story p:last-child { margin-bottom: 0; }
+    .story strong { color: var(--accent); font-weight: 700; }
+
+    .timeline {
+      display: flex; flex-direction: column; gap: 1rem;
+      margin-top: 1.5rem; padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+    .timeline-item {
+      display: flex; gap: 1.2rem; align-items: flex-start;
+    }
+    .timeline-year {
+      font-size: 0.78rem; font-weight: 700; color: var(--accent);
+      background: rgba(129,140,248,0.1); border: 1px solid rgba(129,140,248,0.2);
+      border-radius: 6px; padding: 2px 10px; white-space: nowrap;
+      margin-top: 2px; flex-shrink: 0;
+    }
+    .timeline-text { font-size: 0.88rem; color: var(--text); line-height: 1.6; }
+    .timeline-text em { color: var(--muted); font-style: normal; }
+
+    /* ── Team Grid ── */
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 1.2rem;
+      margin-bottom: 3rem;
+    }
+    .member-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.6rem 1.4rem;
+      text-align: center;
+      transition: border-color 0.2s, transform 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .member-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, var(--accent2), var(--pink));
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .member-card:hover { border-color: var(--border2); transform: translateY(-3px); }
+    .member-card:hover::before { opacity: 1; }
+
+    .member-avatar {
+      width: 72px; height: 72px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent2), var(--pink));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.8rem; margin: 0 auto 1rem;
+      border: 2px solid var(--border2);
+    }
+    .member-name {
+      font-weight: 800; font-size: 1rem; margin-bottom: 0.25rem;
+    }
+    .member-role {
+      font-size: 0.78rem; font-weight: 600; color: var(--accent);
+      background: rgba(129,140,248,0.1); border: 1px solid rgba(129,140,248,0.2);
+      border-radius: 20px; padding: 2px 12px; display: inline-block; margin-bottom: 0.8rem;
+    }
+    .member-desc {
+      font-size: 0.83rem; color: var(--muted); line-height: 1.6;
+    }
+
+    /* ── Footer ── */
+    .footer {
+      text-align: center; padding-top: 2rem;
+      border-top: 1px solid var(--border);
+      color: var(--muted); font-size: 0.8rem; line-height: 1.8;
+    }
+    .footer a { color: var(--accent); text-decoration: none; }
+    .footer a:hover { text-decoration: underline; }
+
+    @media (max-width: 600px) {
+      .hero h1 { font-size: 2rem; }
+      .topnav { padding: 0.7rem 1rem; }
+      .story { padding: 1.4rem; }
+      .team-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a class="nav-brand" href="https://eselbande.com">🫏 eselbande.com</a>
+  <div class="nav-links">
+    <a class="nav-link" href="https://go.eselbande.com">🔗 Links</a>
+    <a class="nav-link" href="https://files.eselbande.com">📁 Files</a>
+    <a class="nav-link" href="https://quotes.eselbande.com">💬 Zitate</a>
+    <a class="nav-link" href="https://status.eselbande.com">📡 Status</a>
+  </div>
+</nav>
+
+<div class="container">
+
+  <!-- Hero -->
+  <div class="hero">
+    <span class="hero-emoji">🫏</span>
+    <h1>Das Team</h1>
+    <p class="hero-sub">Die Köpfe hinter der eselbande – eine Handvoll Idioten, die aus einem Discord-Server eine ganze Plattform gebaut haben.</p>
+  </div>
+
+  <!-- Geschichte -->
+  <div class="section-title">📖 Unsere Geschichte</div>
+  <div class="story">
+    <p>
+      Was als kleiner <strong>privater Discord-Server</strong> unter Freunden begann, wurde über die Zeit zu einer echten
+      Community mit eigener Infrastruktur, eigenen Bots und einer Menge gemeinsamer Erinnerungen.
+      Der Name? Kam spontan – und blieb.
+    </p>
+    <p>
+      Irgendwann reichte ein einfacher Server nicht mehr aus. Es fehlte ein Bot, der wirklich alles kann.
+      Also wurde <strong>Marvin (Fahrstuhl)</strong> gebaut – benannt nach dem depressiven Roboter aus
+      „Per Anhalter durch die Galaxis", was irgendwie passte. Danach kamen der Musikbot, das Token-System,
+      der Link-Shortener, der File-Hoster und noch einiges mehr.
+    </p>
+    <p>
+      Heute läuft die gesamte Plattform auf einem eigenen Server, alles selbst entwickelt, selbst gehostet –
+      <strong>von der Community, für die Community</strong>.
+    </p>
+
+    <div class="timeline">
+      <div class="timeline-item">
+        <span class="timeline-year">2021</span>
+        <span class="timeline-text">Der Discord-Server geht online. <em>Niemand erwartet, dass er länger als einen Monat existiert.</em></span>
+      </div>
+      <div class="timeline-item">
+        <span class="timeline-year">2022</span>
+        <span class="timeline-text">Erste eigene Bots. Marvin (Fahrstuhl) übernimmt Moderation, Leveling und natürlich Trollerei.</span>
+      </div>
+      <div class="timeline-item">
+        <span class="timeline-year">2023</span>
+        <span class="timeline-text">EselTokens-System und Dashboard gehen live. Die Community kriegt eine eigene Währung.</span>
+      </div>
+      <div class="timeline-item">
+        <span class="timeline-year">2024</span>
+        <span class="timeline-text">eselbande.com geht offiziell online. Link-Shortener, File-Hoster, Zitat-Board, Status-Page.</span>
+      </div>
+      <div class="timeline-item">
+        <span class="timeline-year">2025</span>
+        <span class="timeline-text">EselMusic mit Lavalink und Spotify-Support. 24/7-Modus hält die Channels am Leben.</span>
+      </div>
+      <div class="timeline-item">
+        <span class="timeline-year">2026</span>
+        <span class="timeline-text">Die Plattform wächst weiter. Und ja, es gibt jetzt auch eine Team-Seite. <em>Hallo.</em></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Team -->
+  <div class="section-title">👥 Die Gründer</div>
+  <div class="team-grid">
+
+    <div class="member-card">
+      <div class="member-avatar">🫏</div>
+      <div class="member-name">Placeholder</div>
+      <div class="member-role">Gründer & Dev</div>
+      <div class="member-desc">Hat angefangen, "kurz etwas zu programmieren". Seitdem nicht mehr aufgehört.</div>
+    </div>
+
+    <div class="member-card">
+      <div class="member-avatar">⚙️</div>
+      <div class="member-name">Placeholder</div>
+      <div class="member-role">Co-Gründer</div>
+      <div class="member-desc">Für jede schlechte Idee, die hier umgesetzt wurde, trägt er Mitverantwortung.</div>
+    </div>
+
+    <div class="member-card">
+      <div class="member-avatar">🎵</div>
+      <div class="member-name">Placeholder</div>
+      <div class="member-role">Musik & Vibes</div>
+      <div class="member-desc">Verantwortlich dafür, dass im Voice immer irgendwas läuft. 24/7.</div>
+    </div>
+
+    <div class="member-card">
+      <div class="member-avatar">🛡️</div>
+      <div class="member-name">Placeholder</div>
+      <div class="member-role">Moderator</div>
+      <div class="member-desc">Hält den Laden zusammen, wenn alle anderen zu beschäftigt damit sind, ihn auseinanderzunehmen.</div>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <p>🫏 eselbande.com · Selbst gehostet, selbst gebaut, selbst verschuldet.</p>
+    <p style="margin-top:6px"><a href="https://eselbande.com">← Zurück zur Startseite</a></p>
+  </div>
+
+</div>
+</body>
+</html>
