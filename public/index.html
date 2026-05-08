@@ -316,15 +316,18 @@
 
       title.textContent = `👥 Das Team (${members.length})`;
 
-      grid.innerHTML = members.map(m => `
-        <div class="member-card">
-          <div class="member-avatar">
-            <img src="${m.avatar}" alt="${m.username}" loading="lazy" onerror="this.parentElement.textContent='${m.roleEmoji || '🫏'}'">
+      grid.innerHTML = members.map(m => {
+        const badgeStyle = m.roleColor ? `style="color:${m.roleColor};background:${m.roleColor}22;border-color:${m.roleColor}44"` : '';
+        return `
+          <div class="member-card">
+            <div class="member-avatar">
+              <img src="${m.avatar}" alt="${escHtml(m.username)}" loading="lazy" onerror="this.parentElement.textContent='🫏'">
+            </div>
+            <div class="member-name">${escHtml(m.username)}</div>
+            <div class="member-role" ${badgeStyle}>${escHtml(m.role)}</div>
           </div>
-          <div class="member-name">${escHtml(m.username)}</div>
-          <div class="member-role">${escHtml(m.roleEmoji + ' ' + m.role)}</div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     } catch (err) {
       grid.innerHTML = `<div class="team-error" style="grid-column:1/-1"><strong>Team konnte nicht geladen werden</strong>${escHtml(err.message)}<br><small>Der Fahrstuhl-Bot ist möglicherweise gerade offline.</small></div>`;
     }
