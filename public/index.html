@@ -133,12 +133,39 @@
     .timeline-text { font-size: 0.88rem; color: var(--text); line-height: 1.6; }
     .timeline-text em { color: var(--muted); font-style: normal; }
 
+    /* ── Role Section ── */
+    .role-section {
+      margin-bottom: 2.5rem;
+    }
+    .role-section-header {
+      display: flex; align-items: center; gap: 0.8rem;
+      margin-bottom: 1rem;
+    }
+    .role-section-name {
+      font-size: 0.85rem; font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+    .role-section-count {
+      font-size: 0.75rem; font-weight: 600;
+      background: var(--surface2); border: 1px solid var(--border2);
+      border-radius: 20px; padding: 1px 10px;
+      color: var(--muted);
+    }
+    .role-section-line {
+      flex: 1; height: 1px; background: var(--border);
+    }
+    .role-section-empty {
+      font-size: 0.83rem; color: var(--muted);
+      padding: 1rem 1.2rem;
+      background: var(--surface); border: 1px dashed var(--border);
+      border-radius: 10px;
+    }
+
     /* ── Team Grid ── */
     .team-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
       gap: 1.2rem;
-      margin-bottom: 3rem;
     }
     .member-card {
       background: var(--surface);
@@ -290,48 +317,82 @@
   </div>
 
   <!-- Team -->
-  <div class="section-title" id="team-section-title">👥 Die Gründer</div>
-  <div class="team-grid" id="team-grid">
+  <div id="team-container">
     <!-- Skeleton placeholders while loading -->
-    <div class="member-card"><div class="member-avatar skeleton skeleton-avatar"></div><div class="skeleton skeleton-line" style="width:60%"></div><div class="skeleton skeleton-badge"></div><div class="skeleton skeleton-line" style="width:80%"></div></div>
-    <div class="member-card"><div class="member-avatar skeleton skeleton-avatar"></div><div class="skeleton skeleton-line" style="width:55%"></div><div class="skeleton skeleton-badge"></div><div class="skeleton skeleton-line" style="width:75%"></div></div>
-    <div class="member-card"><div class="member-avatar skeleton skeleton-avatar"></div><div class="skeleton skeleton-line" style="width:65%"></div><div class="skeleton skeleton-badge"></div><div class="skeleton skeleton-line" style="width:70%"></div></div>
-    <div class="member-card"><div class="member-avatar skeleton skeleton-avatar"></div><div class="skeleton skeleton-line" style="width:50%"></div><div class="skeleton skeleton-badge"></div><div class="skeleton skeleton-line" style="width:85%"></div></div>
+    <div class="role-section">
+      <div class="role-section-header">
+        <span class="skeleton skeleton-line" style="width:120px;height:16px;margin:0"></span>
+        <div class="role-section-line"></div>
+      </div>
+      <div class="team-grid">
+        <div class="member-card"><div class="member-avatar skeleton skeleton-avatar"></div><div class="skeleton skeleton-line" style="width:60%"></div><div class="skeleton skeleton-badge"></div></div>
+        <div class="member-card"><div class="member-avatar skeleton skeleton-avatar"></div><div class="skeleton skeleton-line" style="width:55%"></div><div class="skeleton skeleton-badge"></div></div>
+        <div class="member-card"><div class="member-avatar skeleton skeleton-avatar"></div><div class="skeleton skeleton-line" style="width:65%"></div><div class="skeleton skeleton-badge"></div></div>
+      </div>
+    </div>
   </div>
 
   <script>
+  // Roles to display as sections, in order (top → bottom)
+  const ROLE_SECTIONS = [
+    { name: '♛ Groß Esel',         emoji: '♛' },
+    { name: '🛡️ Head Admin',        emoji: '🛡️' },
+    { name: 'Esel-Padawan',         emoji: '🫏' },
+    { name: 'Esel Azubi auf probe', emoji: '🐣' },
+  ];
+
   (async function loadTeam() {
-    const grid = document.getElementById('team-grid');
-    const title = document.getElementById('team-section-title');
+    const container = document.getElementById('team-container');
     try {
       const res = await fetch('/api/team');
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
       const members = json.data?.members || [];
 
-      if (members.length === 0) {
-        grid.innerHTML = '<div class="team-error"><strong>Keine Team-Mitglieder gefunden</strong>Bitte konfiguriere die Rollen-IDs im Fahrstuhl-Bot.</div>';
-        return;
+      // Group members by role name
+      const byRole = {};
+      for (const m of members) {
+        if (!byRole[m.role]) byRole[m.role] = [];
+        byRole[m.role].push(m);
       }
 
-      title.textContent = `👥 Das Team (${members.length})`;
+      container.innerHTML = ROLE_SECTIONS.map(section => {
+        const list = byRole[section.name] || [];
+        const color = list[0]?.roleColor || null;
+        const colorStyle = color ? `color:${color}` : 'color:var(--accent)';
+        const cards = list.length === 0
+          ? `<div class="role-section-empty">Aktuell niemand mit dieser Rolle.</div>`
+          : `<div class="team-grid">${list.map(m => memberCard(m)).join('')}</div>`;
 
-      grid.innerHTML = members.map(m => {
-        const badgeStyle = m.roleColor ? `style="color:${m.roleColor};background:${m.roleColor}22;border-color:${m.roleColor}44"` : '';
         return `
-          <div class="member-card">
-            <div class="member-avatar">
-              <img src="${m.avatar}" alt="${escHtml(m.username)}" loading="lazy" onerror="this.parentElement.textContent='🫏'">
+          <div class="role-section">
+            <div class="role-section-header">
+              <span class="role-section-name" style="${colorStyle}">${escHtml(section.name)}</span>
+              <span class="role-section-count">${list.length}</span>
+              <div class="role-section-line"></div>
             </div>
-            <div class="member-name">${escHtml(m.username)}</div>
-            <div class="member-role" ${badgeStyle}>${escHtml(m.role)}</div>
+            ${cards}
           </div>
         `;
       }).join('');
+
     } catch (err) {
-      grid.innerHTML = `<div class="team-error" style="grid-column:1/-1"><strong>Team konnte nicht geladen werden</strong>${escHtml(err.message)}<br><small>Der Fahrstuhl-Bot ist möglicherweise gerade offline.</small></div>`;
+      container.innerHTML = `<div class="team-error"><strong>Team konnte nicht geladen werden</strong>${escHtml(err.message)}<br><small>Der Fahrstuhl-Bot ist möglicherweise gerade offline.</small></div>`;
     }
   })();
+
+  function memberCard(m) {
+    const badgeStyle = m.roleColor ? `style="color:${m.roleColor};background:${m.roleColor}22;border-color:${m.roleColor}44"` : '';
+    return `
+      <div class="member-card">
+        <div class="member-avatar">
+          <img src="${m.avatar}" alt="${escHtml(m.username)}" loading="lazy" onerror="this.parentElement.textContent='🫏'">
+        </div>
+        <div class="member-name">${escHtml(m.username)}</div>
+        <div class="member-role" ${badgeStyle}>${escHtml(m.role)}</div>
+      </div>
+    `;
+  }
 
   function escHtml(str) {
     return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
