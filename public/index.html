@@ -166,7 +166,9 @@
       display: flex; align-items: center; justify-content: center;
       font-size: 1.8rem; margin: 0 auto 1rem;
       border: 2px solid var(--border2);
+      overflow: hidden;
     }
+    .member-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
     .member-name {
       font-weight: 800; font-size: 1rem; margin-bottom: 0.25rem;
     }
@@ -178,6 +180,29 @@
     .member-desc {
       font-size: 0.83rem; color: var(--muted); line-height: 1.6;
     }
+
+    /* ── Skeleton ── */
+    @keyframes shimmer {
+      0%   { background-position: -400px 0; }
+      100% { background-position: 400px 0; }
+    }
+    .skeleton {
+      background: linear-gradient(90deg, var(--surface) 25%, var(--surface2) 50%, var(--surface) 75%);
+      background-size: 800px 100%;
+      animation: shimmer 1.4s infinite;
+      border-radius: 8px;
+    }
+    .skeleton-avatar { width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 1rem; }
+    .skeleton-line   { height: 14px; margin: 6px auto; }
+    .skeleton-badge  { height: 22px; width: 90px; border-radius: 20px; margin: 6px auto; }
+
+    /* ── Error state ── */
+    .team-error {
+      text-align: center; padding: 2rem; color: var(--muted);
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; margin-bottom: 3rem;
+    }
+    .team-error strong { color: var(--text); display: block; margin-bottom: 0.4rem; }
 
     /* ── Footer ── */
     .footer {
@@ -265,38 +290,50 @@
   </div>
 
   <!-- Team -->
-  <div class="section-title">👥 Die Gründer</div>
-  <div class="team-grid">
-
-    <div class="member-card">
-      <div class="member-avatar">🫏</div>
-      <div class="member-name">Placeholder</div>
-      <div class="member-role">Gründer & Dev</div>
-      <div class="member-desc">Hat angefangen, "kurz etwas zu programmieren". Seitdem nicht mehr aufgehört.</div>
-    </div>
-
-    <div class="member-card">
-      <div class="member-avatar">⚙️</div>
-      <div class="member-name">Placeholder</div>
-      <div class="member-role">Co-Gründer</div>
-      <div class="member-desc">Für jede schlechte Idee, die hier umgesetzt wurde, trägt er Mitverantwortung.</div>
-    </div>
-
-    <div class="member-card">
-      <div class="member-avatar">🎵</div>
-      <div class="member-name">Placeholder</div>
-      <div class="member-role">Musik & Vibes</div>
-      <div class="member-desc">Verantwortlich dafür, dass im Voice immer irgendwas läuft. 24/7.</div>
-    </div>
-
-    <div class="member-card">
-      <div class="member-avatar">🛡️</div>
-      <div class="member-name">Placeholder</div>
-      <div class="member-role">Moderator</div>
-      <div class="member-desc">Hält den Laden zusammen, wenn alle anderen zu beschäftigt damit sind, ihn auseinanderzunehmen.</div>
-    </div>
-
+  <div class="section-title" id="team-section-title">👥 Die Gründer</div>
+  <div class="team-grid" id="team-grid">
+    <!-- Skeleton placeholders while loading -->
+    <div class="member-card"><div class="member-avatar skeleton skeleton-avatar"></div><div class="skeleton skeleton-line" style="width:60%"></div><div class="skeleton skeleton-badge"></div><div class="skeleton skeleton-line" style="width:80%"></div></div>
+    <div class="member-card"><div class="member-avatar skeleton skeleton-avatar"></div><div class="skeleton skeleton-line" style="width:55%"></div><div class="skeleton skeleton-badge"></div><div class="skeleton skeleton-line" style="width:75%"></div></div>
+    <div class="member-card"><div class="member-avatar skeleton skeleton-avatar"></div><div class="skeleton skeleton-line" style="width:65%"></div><div class="skeleton skeleton-badge"></div><div class="skeleton skeleton-line" style="width:70%"></div></div>
+    <div class="member-card"><div class="member-avatar skeleton skeleton-avatar"></div><div class="skeleton skeleton-line" style="width:50%"></div><div class="skeleton skeleton-badge"></div><div class="skeleton skeleton-line" style="width:85%"></div></div>
   </div>
+
+  <script>
+  (async function loadTeam() {
+    const grid = document.getElementById('team-grid');
+    const title = document.getElementById('team-section-title');
+    try {
+      const res = await fetch('/api/team');
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+      const members = json.data?.members || [];
+
+      if (members.length === 0) {
+        grid.innerHTML = '<div class="team-error"><strong>Keine Team-Mitglieder gefunden</strong>Bitte konfiguriere die Rollen-IDs im Fahrstuhl-Bot.</div>';
+        return;
+      }
+
+      title.textContent = `👥 Das Team (${members.length})`;
+
+      grid.innerHTML = members.map(m => `
+        <div class="member-card">
+          <div class="member-avatar">
+            <img src="${m.avatar}" alt="${m.username}" loading="lazy" onerror="this.parentElement.textContent='${m.roleEmoji || '🫏'}'">
+          </div>
+          <div class="member-name">${escHtml(m.username)}</div>
+          <div class="member-role">${escHtml(m.roleEmoji + ' ' + m.role)}</div>
+        </div>
+      `).join('');
+    } catch (err) {
+      grid.innerHTML = `<div class="team-error" style="grid-column:1/-1"><strong>Team konnte nicht geladen werden</strong>${escHtml(err.message)}<br><small>Der Fahrstuhl-Bot ist möglicherweise gerade offline.</small></div>`;
+    }
+  })();
+
+  function escHtml(str) {
+    return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+  </script>
 
   <!-- Footer -->
   <div class="footer">
