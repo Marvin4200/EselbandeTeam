@@ -135,37 +135,48 @@
 
     /* ── Role Section ── */
     .role-section {
-      margin-bottom: 2.5rem;
+      margin-bottom: 3rem;
     }
     .role-section-header {
-      display: flex; align-items: center; gap: 0.8rem;
-      margin-bottom: 1rem;
+      display: flex; align-items: center; gap: 1rem;
+      padding: 0.9rem 1.4rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px 12px 0 0;
+      border-bottom: none;
+    }
+    .role-section-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      flex-shrink: 0;
     }
     .role-section-name {
-      font-size: 0.85rem; font-weight: 700;
-      letter-spacing: 0.05em;
+      font-size: 0.95rem; font-weight: 700;
+      flex: 1;
     }
     .role-section-count {
       font-size: 0.75rem; font-weight: 600;
       background: var(--surface2); border: 1px solid var(--border2);
-      border-radius: 20px; padding: 1px 10px;
+      border-radius: 20px; padding: 2px 10px;
       color: var(--muted);
     }
-    .role-section-line {
-      flex: 1; height: 1px; background: var(--border);
+    .role-section-body {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-top: none;
+      border-radius: 0 0 12px 12px;
+      padding: 1.2rem;
     }
     .role-section-empty {
       font-size: 0.83rem; color: var(--muted);
-      padding: 1rem 1.2rem;
-      background: var(--surface); border: 1px dashed var(--border);
-      border-radius: 10px;
+      padding: 0.8rem 0.4rem;
+      text-align: center;
     }
 
     /* ── Team Grid ── */
     .team-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-      gap: 1.2rem;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1rem;
     }
     .member-card {
       background: var(--surface);
@@ -358,20 +369,20 @@
 
       container.innerHTML = ROLE_SECTIONS.map(section => {
         const list = byRole[section.name] || [];
-        const color = list[0]?.roleColor || null;
-        const colorStyle = color ? `color:${color}` : 'color:var(--accent)';
+        const color = list[0]?.roleColor || '#818cf8';
+        const dot = `<span class="role-section-dot" style="background:${color}"></span>`;
         const cards = list.length === 0
           ? `<div class="role-section-empty">Aktuell niemand mit dieser Rolle.</div>`
           : `<div class="team-grid">${list.map(m => memberCard(m)).join('')}</div>`;
 
         return `
           <div class="role-section">
-            <div class="role-section-header">
-              <span class="role-section-name" style="${colorStyle}">${escHtml(section.name)}</span>
-              <span class="role-section-count">${list.length}</span>
-              <div class="role-section-line"></div>
+            <div class="role-section-header" style="border-top:2px solid ${color}22">
+              ${dot}
+              <span class="role-section-name" style="color:${color}">${escHtml(section.name)}</span>
+              <span class="role-section-count">${list.length} Mitglied${list.length !== 1 ? 'er' : ''}</span>
             </div>
-            ${cards}
+            <div class="role-section-body">${cards}</div>
           </div>
         `;
       }).join('');
