@@ -135,11 +135,11 @@
 
     /* ── Role Section ── */
     .role-section {
-      margin-bottom: 3rem;
+      margin-bottom: 2.5rem;
     }
     .role-section-header {
       display: flex; align-items: center; gap: 1rem;
-      padding: 0.9rem 1.4rem;
+      padding: 1rem 1.4rem;
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 12px 12px 0 0;
@@ -149,15 +149,21 @@
       width: 10px; height: 10px; border-radius: 50%;
       flex-shrink: 0;
     }
+    .role-section-info {
+      flex: 1;
+      min-width: 0;
+    }
     .role-section-name {
       font-size: 0.95rem; font-weight: 700;
-      flex: 1;
+    }
+    .role-section-desc {
+      font-size: 0.75rem; color: var(--muted); margin-top: 2px;
     }
     .role-section-count {
       font-size: 0.75rem; font-weight: 600;
       background: var(--surface2); border: 1px solid var(--border2);
       border-radius: 20px; padding: 2px 10px;
-      color: var(--muted);
+      color: var(--muted); white-space: nowrap; flex-shrink: 0;
     }
     .role-section-body {
       background: var(--surface);
@@ -231,24 +237,32 @@
     .member-card:hover::before { opacity: 1; }
 
     .member-avatar {
-      width: 72px; height: 72px; border-radius: 50%;
+      width: 80px; height: 80px; border-radius: 50%;
       background: linear-gradient(135deg, var(--accent2), var(--pink));
       display: flex; align-items: center; justify-content: center;
       font-size: 1.8rem; margin: 0 auto 1rem;
       border: 2px solid var(--border2);
       overflow: hidden;
+      box-shadow: 0 0 0 4px rgba(0,0,0,0.4);
+      transition: box-shadow 0.2s;
+    }
+    .member-card:hover .member-avatar {
+      box-shadow: 0 0 0 4px rgba(0,0,0,0.4), 0 0 20px rgba(102,126,234,0.25);
     }
     .member-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
     .member-name {
-      font-weight: 800; font-size: 1rem; margin-bottom: 0.25rem;
+      font-weight: 800; font-size: 1rem; margin-bottom: 0.3rem;
     }
     .member-role {
       font-size: 0.78rem; font-weight: 600; color: var(--accent);
       background: rgba(129,140,248,0.1); border: 1px solid rgba(129,140,248,0.2);
-      border-radius: 20px; padding: 2px 12px; display: inline-block; margin-bottom: 0.8rem;
+      border-radius: 20px; padding: 2px 12px; display: inline-block; margin-bottom: 0.75rem;
     }
     .member-since {
-      font-size: 0.75rem; color: var(--muted); margin-top: 0.4rem;
+      font-size: 0.75rem; color: var(--muted); margin-top: 0.3rem;
+    }
+    .member-duration {
+      font-size: 0.7rem; color: var(--muted); opacity: 0.6;
     }
     .member-desc {
       font-size: 0.83rem; color: var(--muted); line-height: 1.6;
@@ -404,10 +418,10 @@
   <script>
   // Roles to display as sections, in order (top → bottom)
   const ROLE_SECTIONS = [
-    { name: '♛ Groß Esel',         emoji: '♛' },
-    { name: '🛡️ Head Admin',        emoji: '🛡️' },
-    { name: 'Esel-Padawan',         emoji: '🫏' },
-    { name: 'Esel Azubi auf probe', emoji: '🐣' },
+    { name: '♛ Groß Esel',         emoji: '♛', desc: 'Gründer und Herr über alles — unantastbar.' },
+    { name: '🛡️ Head Admin',        emoji: '🛡️', desc: 'Zuständig für alles, was niemand sonst machen will.' },
+    { name: 'Esel-Padawan',         emoji: '🫏', desc: 'Bewährte Mitglieder der inneren Eselbande.' },
+    { name: 'Esel Azubi auf probe', emoji: '🐣', desc: 'Frisch eingestiegen — noch unter Beobachtung.' },
   ];
 
   (async function loadTeam() {
@@ -435,9 +449,12 @@
 
         return `
           <div class="role-section">
-            <div class="role-section-header" style="border-top:2px solid ${color}22">
+            <div class="role-section-header" style="border-top:2px solid ${color}33">
               ${dot}
-              <span class="role-section-name" style="color:${color}">${escHtml(section.name)}</span>
+              <div class="role-section-info">
+                <div class="role-section-name" style="color:${color}">${escHtml(section.name)}</div>
+                ${section.desc ? `<div class="role-section-desc">${escHtml(section.desc)}</div>` : ''}
+              </div>
               <span class="role-section-count">${list.length} Mitglied${list.length !== 1 ? 'er' : ''}</span>
             </div>
             <div class="role-section-body">${cards}</div>
@@ -473,6 +490,7 @@
               <div class="member-name">${escHtml(m.username)}</div>
               <div class="member-role" ${badgeStyle}>${escHtml(m.role)}</div>
               <div class="member-since">dabei seit ${joinYear(m.joinedAt)}</div>
+              <div class="member-duration">${memberDuration(m.joinedAt)}</div>
             </div>
           </div>
         </div>
@@ -487,6 +505,7 @@
         <div class="member-name">${escHtml(m.username)}</div>
         <div class="member-role" ${badgeStyle}>${escHtml(m.role)}</div>
         <div class="member-since">dabei seit ${joinYear(m.joinedAt)}</div>
+        <div class="member-duration">${memberDuration(m.joinedAt)}</div>
       </div>
     `;
   }
@@ -494,6 +513,16 @@
   function joinYear(iso) {
     if (!iso) return '?';
     return new Date(iso).getFullYear();
+  }
+
+  function memberDuration(iso) {
+    if (!iso) return '';
+    const months = Math.floor((Date.now() - new Date(iso)) / (1000 * 60 * 60 * 24 * 30.44));
+    if (months < 1)  return '(gerade erst)';
+    if (months < 12) return `(${months} Monate)`;
+    const years = Math.floor(months / 12);
+    const rem   = months % 12;
+    return rem > 0 ? `(${years}j ${rem}m)` : `(${years} Jahr${years > 1 ? 'e' : ''})`;
   }
 
   function escHtml(str) {
